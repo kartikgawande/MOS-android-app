@@ -14,7 +14,6 @@ import java.util.Objects;
 public class DiscardBtnReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-
         Intent serviceIntent = new Intent(context, DiscardBtnService.class);
         // Add extras or action to the intent if needed
         String notificationID = Objects.requireNonNull(intent.getStringExtra(BaseColumns._ID));
