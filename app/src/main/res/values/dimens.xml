@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="floating_point_bt_margin">36dp</dimen>
+    <dimen name="text_views_margin">26dp</dimen>
+    <dimen name="input_text_views_margin">150dp</dimen>
+    <dimen name="title_tv_text_size">15sp</dimen>
+    <dimen name="subtitle_tv_text_size">12sp</dimen>
+    <dimen name="small_margin">10dp</dimen>
+</resources>
