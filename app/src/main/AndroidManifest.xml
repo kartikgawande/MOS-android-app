@@ -27,6 +27,8 @@
 <!--                the com.mos part above is random i choose it arbitrarily to keep it unique-->
             </intent-filter>
         </receiver>
+        <receiver android:name=".notesNotifications.receivers.EyeCareReceiver"
+            android:exported="true"/>
         <receiver android:name=".notesNotifications.receivers.DiscardBtnReceiver"
             android:exported="true"/>
         <receiver android:name=".notesNotifications.receivers.TestedBtnReceiver"

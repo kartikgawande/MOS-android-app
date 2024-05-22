@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.icu.util.Calendar;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +34,7 @@ import android.Manifest;
 import android.widget.Toast;
 
 import com.example.mos.googleDrive.GoogleDriveUtils;
+import com.example.mos.notesNotifications.receivers.EyeCareReceiver;
 import com.example.mos.notesRV.NoteItemModel;
 import com.example.mos.notesRV.NotesRVadapter;
 import com.example.mos.notesNotifications.receivers.NotesReminderReceiver;
@@ -72,6 +74,23 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
         }
     }
 
+    private void createNotificationChannels() {
+        CharSequence channelName = "Notes Notifications";
+        String description = "Channel for Revising Notes";
+        int channelImportance = NotificationManager.IMPORTANCE_DEFAULT;
+        createNotificationChannel(channelName, description, channelImportance, CustomConstants.NOTES_NOTIFICATION_CHANNEL_ID);
+
+        CharSequence serviceChannelName = "Service Notifications";
+        String serviceDescription = "Channel about notifying foreground services.";
+        int serviceChannelImportance = NotificationManager.IMPORTANCE_DEFAULT;
+        createNotificationChannel(serviceChannelName, serviceDescription,serviceChannelImportance, CustomConstants.SERVICE_NOTIFICATION_CHANNEL_ID);
+
+        CharSequence eyeCareChannelName = "Eye Care Notifications";
+        String eyeCareDescription = "Channel about notifying to see far every 20 minutes.";
+        int eyeCareChannelImportance = NotificationManager.IMPORTANCE_HIGH;
+        createNotificationChannel(eyeCareChannelName, eyeCareDescription, eyeCareChannelImportance, CustomConstants.EYE_CARE_NOTIFICATION_CHANNEL_ID);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,10 +104,7 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
 
         new GoogleDriveUtils(this); //this is important dont delete
 
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            // You can post notifications.
-            createNotificationChannels();
-        } else {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             // You cannot post notifications. Ask for permission.
             ActivityCompat.requestPermissions(
                     MainActivity.this,
@@ -98,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
         }
 
         createNotificationChannels();
-        scheduleAlarm(NOTIFICATION_REPEAT_AFTER_MILIS);
+//        scheduleAlarm(NOTIFICATION_REPEAT_AFTER_MILIS);
 
 
         noteRV = findViewById(R.id.notesRV);
@@ -178,11 +194,8 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
         if(!notesRVupdating)signInLauncher.launch(signInIntent);
     }
 
-    private void createNotificationChannels() {
-        CharSequence channelName = "Notes Notifications";
-        String description = "Channel for Reminding Notes";
-        int channelImportance = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel channel = new NotificationChannel(CustomConstants.NOTES_NOTIFICATION_CHANNEL_ID, channelName, channelImportance);
+    private void createNotificationChannel(CharSequence name, String description, int importance, String channelId) {
+        NotificationChannel channel = new NotificationChannel(channelId, name, importance);
         channel.setDescription(description);
         // Register the channel with the system; you can't change the importance
         // or other notification behaviors after this
@@ -190,52 +203,55 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
         notificationManager.createNotificationChannel(channel);
 
         //register receiver
-        IntentFilter intentFilter = new IntentFilter("com.example.mos.notifications.NOTIFICATIONEVENT");
-        NotesReminderReceiver receiver = new NotesReminderReceiver();
-        registerReceiver(receiver, intentFilter, Context.RECEIVER_EXPORTED);
-
-        CharSequence channelName1 = "Service Notifications";
-        String description1 = "Channel about notifying foreground services.";
-        int channelImportance1 = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel channel1 = new NotificationChannel(CustomConstants.SERVICE_NOTIFICATION_CHANNEL_ID, channelName1, channelImportance1);
-        channel1.setDescription(description1);
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this
-        NotificationManager notificationManager1 = getSystemService(NotificationManager.class);
-        notificationManager1.createNotificationChannel(channel1);
+//        IntentFilter intentFilter = new IntentFilter("com.example.mos.notifications.NOTIFICATIONEVENT");
+//        NotesReminderReceiver receiver = new NotesReminderReceiver();
+//        registerReceiver(receiver, intentFilter, Context.RECEIVER_EXPORTED);
     }
 
-    private void scheduleAlarm(int interval) {
-        Intent intent = new Intent(MainActivity.this, NotesReminderReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-        // Set the alarm to start at approximately the current time.
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-
-        // Use 60000 milliseconds as the interval for a 1-minute repeat.
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                interval, pendingIntent);
-
-        //20 20 20 eye rule
-        Intent intent202020 = new Intent(MainActivity.this, NotesReminderReceiver.class);
-        PendingIntent pendingIntent202020 = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
-        AlarmManager alarmManager202020 = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-        // Set the alarm to start at approximately the current time.
-        Calendar calendar202020 = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-
-        // Use 60000 milliseconds as the interval for a 1-minute repeat.
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar202020.getTimeInMillis(),
-                interval, pendingIntent);
-    }
+//    private void scheduleAlarm(int interval) {
+//        Intent intent = new Intent(MainActivity.this, NotesReminderReceiver.class);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+//
+//        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+//
+//        // Set the alarm to start at approximately the current time.
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(System.currentTimeMillis());
+//
+//        // Use 60000 milliseconds as the interval for a 1-minute repeat.
+//        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+//                interval, pendingIntent);
+//
+//        alarmManager.canScheduleExactAlarms();
+//
+//        //20 20 20 eye rule
+//        Intent intent202020 = new Intent(MainActivity.this, NotesReminderReceiver.class);
+//        PendingIntent pendingIntent202020 = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+//
+//        AlarmManager alarmManager202020 = (AlarmManager) getSystemService(ALARM_SERVICE);
+//
+//        // Set the alarm to start at approximately the current time.
+//        Calendar calendar202020 = Calendar.getInstance();
+//        calendar.setTimeInMillis(System.currentTimeMillis());
+//
+//        // Use 60000 milliseconds as the interval for a 1-minute repeat.
+////        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar202020.getTimeInMillis(),
+////                interval, pendingIntent);
+//
+//        // Schedule the alarm
+//        calendar.add(Calendar.SECOND, 10);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+//        } else {
+//            // Fall back for older APIs, though less relevant since you need Android M or higher for setExactAndAllowWhileIdle.
+//            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+//        }
+//    }
 
     public void showStartNotification() {
-        Intent intent = new Intent(this, NotesReminderReceiver.class);
-        sendBroadcast(intent);
+        Intent NotesIntent = new Intent(this, NotesReminderReceiver.class);
+        sendBroadcast(NotesIntent);
+        Intent eyeCareIntent = new Intent(this, EyeCareReceiver.class);
+        sendBroadcast(eyeCareIntent);
     }
 }

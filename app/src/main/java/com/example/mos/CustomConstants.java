@@ -6,7 +6,8 @@ public class CustomConstants {
     public final static String DRIVE_APP_DIR = "MOSapp";
 
     public final static String NOTES_NOTIFICATION_CHANNEL_ID = "Notes notification";
-    public final static String SERVICE_NOTIFICATION_CHANNEL_ID = "Serive notifications";
+    public final static String SERVICE_NOTIFICATION_CHANNEL_ID = "Service notifications";
+    public final static String EYE_CARE_NOTIFICATION_CHANNEL_ID = "Eye Care notifications";
     public final static int NOTES_NOTIFICATION_ID = 100;
     public final static int NOTES_NOTIFICATION_PERMISSION_REQUEST_CODE = 364;
     public final static String TESTED_STATE = "Tested";

@@ -1,12 +1,15 @@
 package com.example.mos.notesNotifications.receivers;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.icu.util.Calendar;
+import android.os.Build;
 import android.provider.BaseColumns;
 import android.widget.Toast;
 
@@ -83,7 +86,8 @@ public class NotesReminderReceiver extends BroadcastReceiver {
         editNoteIntent.putExtra(CustomConstants.NOTE_ID,note.getDbRowNo());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, editNoteIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-        String title = notes.get(randIndex).getCategory() + ">" + notes.get(randIndex).getClassification();
+        String title = notes.get(randIndex).getCategory() + ">" + notes.get(randIndex).getClassification()+" ("+
+                notes.get(randIndex).getState()+")";
         String content = notes.get(randIndex).getContent();
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, NOTES_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.mos_app_icon)
@@ -91,7 +95,7 @@ public class NotesReminderReceiver extends BroadcastReceiver {
 //                .setContentText(content)
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(content))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 //                .addAction(R.drawable.bin,"Discard",deletePendingIntent)
@@ -101,6 +105,25 @@ public class NotesReminderReceiver extends BroadcastReceiver {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
 //            notificationManager.cancelAll();
             notificationManager.notify(Integer.parseInt(id), notificationBuilder.build());
+            scheduleNextAlarm(context);
+        }
+    }
+
+    private void scheduleNextAlarm(Context context) {
+        Intent intent = new Intent(context, NotesReminderReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.canScheduleExactAlarms();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.HOUR, 1); // Schedule for one hour later again
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        } else {
+            // Fall back for older APIs, though less relevant since you need Android M or higher for setExactAndAllowWhileIdle.
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }
     }
 }
