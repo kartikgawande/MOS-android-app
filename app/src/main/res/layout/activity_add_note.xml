@@ -35,6 +35,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+
         <EditText
             android:id="@+id/editContent"
             android:layout_width="match_parent"
@@ -46,25 +47,43 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/noteContent" />
 
-        <Button
-            android:id="@+id/categoryBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Mindset"
-            android:layout_marginTop="@dimen/text_views_margin"
+        <LinearLayout
+            android:id="@+id/noteInfo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editContent" />
+            android:layout_marginTop="@dimen/text_views_margin"
+            app:layout_constraintTop_toBottomOf="@+id/editContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/categoryBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/text_views_margin"
+            android:layout_marginLeft="@dimen/text_views_margin"
+            android:text="Mindset" />
 
         <Button
             android:id="@+id/classificationBtn"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginRight="@dimen/text_views_margin"
+            android:layout_marginLeft="@dimen/text_views_margin"
             android:layout_height="wrap_content"
-            android:text="Physical"
-            android:layout_marginTop="@dimen/text_views_margin"
+            android:text="Physical"/>
+
+        </LinearLayout>
+        <Button
+            android:id="@+id/stateBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginRight="@dimen/text_views_margin"
+            android:layout_marginLeft="@dimen/text_views_margin"
+            android:layout_height="wrap_content"
+            android:text="Experimental"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/categoryBtn" />
-
+            app:layout_constraintTop_toBottomOf="@+id/noteInfo"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

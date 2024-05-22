@@ -8,15 +8,19 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.mos.AddNoteActivity;
 import com.example.mos.CustomConstants;
+import com.example.mos.MainActivity;
 import com.example.mos.R;
 import com.example.mos.notesRV.NoteItemModel;
 import com.example.mos.sqlite.DBUtils;
+import com.example.mos.sqlite.NoteTableContract;
 import com.example.mos.sqlite.SQLiteDbHelper;
 
 import java.util.ArrayList;
@@ -37,25 +41,47 @@ public class NotesReminderReceiver extends BroadcastReceiver {
         ArrayList<Map<String,String>> result = dbHelper.getAllRows(dbr, null, null);
         ArrayList<NoteItemModel> notes = DBUtils.convertResultToNotes(result);
         if(notes.isEmpty())return;
+        boolean haveNonDiscarded = false;
+        for(NoteItemModel note: notes){
+            if(note.getState().equals(AddNoteActivity.TESTED_STATE) || note.getState().equals(AddNoteActivity.EXPERIMENTAL_STATE)) haveNonDiscarded = true;
+        }
+        if(!haveNonDiscarded) return;
         Random rand = new Random();
-        int randIndex = rand.nextInt(notes.size());
+        int randIndex;
+        while(true) {
+            randIndex = rand.nextInt(notes.size());
+            String state = result.get(randIndex).get(NoteTableContract.NoteTable.COLUMN_NAME_STATE);
+            if(!state.equals(AddNoteActivity.DISCARDED_STATE)) break;
+        }
         String id = result.get(randIndex).get(BaseColumns._ID);
 
-        Intent deleteIntent = new Intent(context, DiscardBtnReceiver.class);
-        deleteIntent.putExtra(BaseColumns._ID,id);
-        assert id != null;
-        PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context,
-                Integer.parseInt(id),
-                deleteIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+//        Intent deleteIntent = new Intent(context, DiscardBtnReceiver.class);
+//        deleteIntent.putExtra(BaseColumns._ID,id);
+//        assert id != null;
+//        PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context,
+//                Integer.parseInt(id),
+//                deleteIntent,
+//                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+//
+//        Intent testedIntent = new Intent(context, TestedBtnReceiver.class);
+//        testedIntent.putExtra(BaseColumns._ID,id);
+//        assert id != null;
+//        PendingIntent TestedBtnPendingIntent = PendingIntent.getBroadcast(context,
+//                Integer.parseInt(id),
+//                testedIntent,
+//                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        Intent testedIntent = new Intent(context, TestedBtnReceiver.class);
-        testedIntent.putExtra(BaseColumns._ID,id);
-        assert id != null;
-        PendingIntent TestedBtnPendingIntent = PendingIntent.getBroadcast(context,
-                Integer.parseInt(id),
-                testedIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        NoteItemModel note = notes.get(randIndex);
+        Intent editNoteIntent = new Intent(context, AddNoteActivity.class);
+        editNoteIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        editNoteIntent.putExtra(CustomConstants.CALLED_BY,CustomConstants.NOTES_RV_ADAPTER);
+        editNoteIntent.putExtra(CustomConstants.NOTE_CATEGORY,note.getCategory());
+        editNoteIntent.putExtra(CustomConstants.NOTE_CLASSIFICATION,note.getClassification());
+        editNoteIntent.putExtra(CustomConstants.NOTE_STATE,note.getState());
+        editNoteIntent.putExtra(CustomConstants.NOTE_CONTENT,note.getContent());
+        editNoteIntent.putExtra(CustomConstants.NOTE_ID,note.getDbRowNo());
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, editNoteIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         String title = notes.get(randIndex).getCategory() + ">" + notes.get(randIndex).getClassification();
         String content = notes.get(randIndex).getContent();
@@ -65,14 +91,16 @@ public class NotesReminderReceiver extends BroadcastReceiver {
 //                .setContentText(content)
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(content))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .addAction(R.drawable.bin,"Discard",deletePendingIntent)
-                .addAction(R.drawable.bin,"Tested",TestedBtnPendingIntent);
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+//                .addAction(R.drawable.bin,"Discard",deletePendingIntent)
+//                .addAction(R.drawable.bin,"Tested",TestedBtnPendingIntent);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+//            notificationManager.cancelAll();
             notificationManager.notify(Integer.parseInt(id), notificationBuilder.build());
-            return;
         }
     }
 }

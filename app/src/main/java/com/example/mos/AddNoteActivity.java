@@ -36,9 +36,9 @@ public class AddNoteActivity extends AppCompatActivity {
     private final String MENTAL_CLASSIFICATION = "Mental";
     private final String EMOTION_CLASSIFICATION = "Emotional";
     private final String FINANCIAL_CLASSIFICATION = "Financial";
-    private final String EXPERIMENTAL_STATE = "Experimental";
-    private final String TESTED_STATE = "Tested";
-    private final String DISCARDED_STATE = "Discarded";
+    public static final String EXPERIMENTAL_STATE = "Experimental";
+    public static final String TESTED_STATE = "Tested";
+    public static final String DISCARDED_STATE = "Discarded";
 
     SQLiteDbHelper dbHelper;
 
@@ -77,6 +77,7 @@ public class AddNoteActivity extends AppCompatActivity {
         EditText editContent = findViewById(R.id.editContent);
         Button categoryBtn = findViewById(R.id.categoryBtn);
         Button classificationBtn = findViewById(R.id.classificationBtn);
+        Button stateBtn = findViewById(R.id.stateBtn);
         FloatingActionButton addNoteBtn = findViewById(R.id.addNoteBtn);
 
         Intent callingIntent = getIntent();
@@ -87,18 +88,20 @@ public class AddNoteActivity extends AppCompatActivity {
             editContent.setText(extras.getString(CustomConstants.NOTE_CONTENT));
             categoryBtn.setText(extras.getString(CustomConstants.NOTE_CATEGORY));
             classificationBtn.setText(extras.getString(CustomConstants.NOTE_CLASSIFICATION));
+            stateBtn.setText(extras.getString(CustomConstants.NOTE_STATE));
             addNoteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String content = editContent.getText().toString();
                     String classification = classificationBtn.getText().toString();
                     String category = categoryBtn.getText().toString();
-                    String state = extras.getString(CustomConstants.NOTE_STATE);
+                    String state = stateBtn.getText().toString();
 
                     ContentValues values = new ContentValues();
                     values.put(NoteTableContract.NoteTable.COLUMN_NAME_CATEGORY,category);
                     values.put(NoteTableContract.NoteTable.COLUMN_NAME_CLASSIFICATION,classification);
                     values.put(NoteTableContract.NoteTable.COLUMN_NAME_CONTENT,content);
+                    values.put(NoteTableContract.NoteTable.COLUMN_NAME_STATE,state);
 
                     dbHelper.updateRow(dbw, NoteTableContract.NoteTable.TABLE_NAME,values,extras.getString(CustomConstants.NOTE_ID));
                     signInAndBackupDBtoDrive(signInLauncher);
@@ -113,7 +116,7 @@ public class AddNoteActivity extends AppCompatActivity {
                     String content = editContent.getText().toString();
                     String classification = classificationBtn.getText().toString();
                     String category = categoryBtn.getText().toString();
-                    String state = EXPERIMENTAL_STATE;
+                    String state = stateBtn.getText().toString();
                     dbHelper.addNote(dbw, classification, category, content, state);
                     signInAndBackupDBtoDrive(signInLauncher);
                 }
@@ -137,6 +140,16 @@ public class AddNoteActivity extends AppCompatActivity {
                 else if(label.equals(MENTAL_CLASSIFICATION)) classificationBtn.setText(EMOTION_CLASSIFICATION);
                 else if(label.equals(EMOTION_CLASSIFICATION)) classificationBtn.setText(FINANCIAL_CLASSIFICATION);
                 else if(label.equals(FINANCIAL_CLASSIFICATION)) classificationBtn.setText(PHYSICAL_CLASSIFICATION);
+            }
+        });
+
+        stateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String label = stateBtn.getText().toString();
+                if(label.equals(EXPERIMENTAL_STATE)) stateBtn.setText(TESTED_STATE);
+                else if(label.equals(TESTED_STATE)) stateBtn.setText(DISCARDED_STATE);
+                else if(label.equals(DISCARDED_STATE)) stateBtn.setText(EXPERIMENTAL_STATE);
             }
         });
     }

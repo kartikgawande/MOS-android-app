@@ -21,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
             @Override
             public void run() {
                 notesRVadapter.notifyDataSetChanged();
+                showStartNotification();
             }
         });
     }
@@ -209,15 +211,31 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-// Set the alarm to start at approximately the current time.
+        // Set the alarm to start at approximately the current time.
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
 
-// Use 60000 milliseconds as the interval for a 1-minute repeat.
+        // Use 60000 milliseconds as the interval for a 1-minute repeat.
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 interval, pendingIntent);
 
+        //20 20 20 eye rule
+        Intent intent202020 = new Intent(MainActivity.this, NotesReminderReceiver.class);
+        PendingIntent pendingIntent202020 = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        AlarmManager alarmManager202020 = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        // Set the alarm to start at approximately the current time.
+        Calendar calendar202020 = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+
+        // Use 60000 milliseconds as the interval for a 1-minute repeat.
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar202020.getTimeInMillis(),
+                interval, pendingIntent);
     }
 
-
+    public void showStartNotification() {
+        Intent intent = new Intent(this, NotesReminderReceiver.class);
+        sendBroadcast(intent);
+    }
 }
