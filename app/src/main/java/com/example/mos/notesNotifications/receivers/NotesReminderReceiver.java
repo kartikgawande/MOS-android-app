@@ -2,6 +2,8 @@ package com.example.mos.notesNotifications.receivers;
 
 import static com.example.mos.CustomConstants.DISCARDED_STATE;
 import static com.example.mos.CustomConstants.EXPERIMENTAL_STATE;
+import static com.example.mos.CustomConstants.MAIN_ACTIVITY;
+import static com.example.mos.CustomConstants.SOURCE;
 import static com.example.mos.CustomConstants.TESTED_STATE;
 
 import android.Manifest;
@@ -14,24 +16,18 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.icu.util.Calendar;
 import android.os.Build;
-import android.provider.BaseColumns;
-import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.example.mos.AddNoteActivity;
+import com.example.mos.ui.notes.AddEditNoteActivity;
 import com.example.mos.CustomConstants;
-import com.example.mos.MainActivity;
 import com.example.mos.R;
-import com.example.mos.notesRV.NoteItemModel;
-import com.example.mos.sqlite.DBUtils;
-import com.example.mos.sqlite.NoteTableContract;
-import com.example.mos.sqlite.SQLiteDbHelper;
+import com.example.mos.ui.notes.notesRV.NoteItemModel;
+import com.example.mos.sqlite.SQLiteDbQueries;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Random;
 
 public class NotesReminderReceiver extends BroadcastReceiver {
@@ -42,11 +38,10 @@ public class NotesReminderReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 //        Log.e(CustomConstants.CUSTOM_LOG_TAG, "notify");
-        SQLiteDbHelper dbHelper = new SQLiteDbHelper(context);
+        SQLiteDbQueries dbHelper = new SQLiteDbQueries(context);
         SQLiteDatabase dbr = dbHelper.getReadableDatabase();
 
-        ArrayList<Map<String,String>> result = dbHelper.getAllRows(dbr, null, null);
-        ArrayList<NoteItemModel> notes = DBUtils.convertResultToNotes(result);
+        ArrayList<NoteItemModel> notes = dbHelper.getAllNotes(dbr);
         if(notes.isEmpty())return;
         boolean haveNonDiscarded = false;
         for(NoteItemModel note: notes){
@@ -57,10 +52,10 @@ public class NotesReminderReceiver extends BroadcastReceiver {
         int randIndex;
         while(true) {
             randIndex = rand.nextInt(notes.size());
-            String state = result.get(randIndex).get(NoteTableContract.NoteTable.COLUMN_NAME_STATE);
+            String state = notes.get(randIndex).getState();
             if(!state.equals(DISCARDED_STATE)) break;
         }
-        String id = result.get(randIndex).get(BaseColumns._ID);
+        String id = notes.get(randIndex).getDbRowNo();
 
 //        Intent deleteIntent = new Intent(context, DiscardBtnReceiver.class);
 //        deleteIntent.putExtra(BaseColumns._ID,id);
@@ -80,7 +75,7 @@ public class NotesReminderReceiver extends BroadcastReceiver {
 
 
         NoteItemModel note = notes.get(randIndex);
-        Intent editNoteIntent = new Intent(context, AddNoteActivity.class);
+        Intent editNoteIntent = new Intent(context, AddEditNoteActivity.class);
         editNoteIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         editNoteIntent.putExtra(CustomConstants.CALLED_BY,CustomConstants.NOTES_RV_ADAPTER);
         editNoteIntent.putExtra(CustomConstants.NOTE_CATEGORY,note.getCategory());
@@ -108,12 +103,14 @@ public class NotesReminderReceiver extends BroadcastReceiver {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             Intent alarmScheduleIntent = new Intent(context, EyeCareReceiver.class);
-            if(PendingIntent.getBroadcast(context, 0, alarmScheduleIntent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) != null){
-//                Toast.makeText(context, "Already scheduled.", Toast.LENGTH_SHORT).show();
-                return;
+            if(PendingIntent.getBroadcast(context, 0, alarmScheduleIntent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) == null){
+                //not scheduled
+                PendingIntent alarmSchedulePendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                scheduleNextAlarm(context, alarmSchedulePendingIntent);
             }
-            PendingIntent alarmSchedulePendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-            scheduleNextAlarm(context, alarmSchedulePendingIntent);
+
+            String calledBy = intent.getStringExtra(SOURCE);
+            if(calledBy!=null && calledBy.equals(MAIN_ACTIVITY)) return;
 
 //            notificationManager.cancelAll();
             notificationManager.notify(Integer.parseInt(id), notificationBuilder.build());

@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.example.mos.CustomConstants;
 import com.example.mos.MainActivity;
 import com.example.mos.sqlite.DBUtils;
+import com.example.mos.ui.notes.NotesFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -28,12 +29,11 @@ import java.io.OutputStream;
 import java.util.Collections;
 
 public class GoogleDriveUtils {
-
     public GoogleDriveUtils(MainActivity context){
         onDriveUpdatedLocalDBlistener=context;
     }
     public interface OnDriveUpdatedLocalDBlistener{
-        public void setOnDriveUpdatedLocalDBListener();
+        void setOnDriveUpdatedLocalDBListener();
     }
     public static OnDriveUpdatedLocalDBlistener onDriveUpdatedLocalDBlistener;
     private final static String CUSTOM_LOG_TAG = CustomConstants.CUSTOM_LOG_TAG;
@@ -83,6 +83,7 @@ public class GoogleDriveUtils {
     }
 
     public static void downloadFileSaveAndUpdateDBlocalFile(String filename, Drive googleDriveService, String driveFileName, String driveDir, Context context, String dbName, String localBackupfileName){
+//        Toast.makeText(context, "yes!", Toast.LENGTH_SHORT).show();
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {

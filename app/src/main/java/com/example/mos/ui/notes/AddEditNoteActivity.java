@@ -1,4 +1,4 @@
-package com.example.mos;
+package com.example.mos.ui.notes;
 
 import static com.example.mos.CustomConstants.DISCARDED_STATE;
 import static com.example.mos.CustomConstants.EMOTION_CLASSIFICATION;
@@ -20,41 +20,43 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.mos.CustomConstants;
+import com.example.mos.R;
 import com.example.mos.googleDrive.GoogleDriveUtils;
 import com.example.mos.sqlite.DBUtils;
 import com.example.mos.sqlite.NoteTableContract;
-import com.example.mos.sqlite.SQLiteDbHelper;
+import com.example.mos.sqlite.SQLiteDbQueries;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.api.services.drive.Drive;
 
-public class AddNoteActivity extends AppCompatActivity {
+public class AddEditNoteActivity extends AppCompatActivity {
 
-    SQLiteDbHelper dbHelper;
+    SQLiteDbQueries dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_add_note);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.notesRVlayout), (v, insets) -> {
+        setContentView(R.layout.activity_add_edit_note);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.addEditNotelayout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        dbHelper = new SQLiteDbHelper(this);
+        dbHelper = new SQLiteDbQueries(this);
         SQLiteDatabase dbw = dbHelper.getWritableDatabase();
         SQLiteDatabase dbr = dbHelper.getReadableDatabase();
 
@@ -65,8 +67,8 @@ public class AddNoteActivity extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent intentData = result.getData();
                         try {
-                            Drive googleDriveService = GoogleDriveUtils.getDriveService(AddNoteActivity.this,intentData);
-                            DBUtils.backupDBtoDrive(this, SQLiteDbHelper.DATABASE_NAME,googleDriveService);
+                            Drive googleDriveService = GoogleDriveUtils.getDriveService(AddEditNoteActivity.this,intentData);
+                            DBUtils.backupDBtoDrive(this, SQLiteDbQueries.DATABASE_NAME,googleDriveService);
                         } catch (ApiException e) {
                             // Google Sign In failed
                             Log.w("CustomTag", "Google sign in failed:", e);
@@ -76,6 +78,7 @@ public class AddNoteActivity extends AppCompatActivity {
         );
 
         EditText editContent = findViewById(R.id.editContent);
+        Toolbar toolbar = findViewById(R.id.addNoteToolbar);
         Button categoryBtn = findViewById(R.id.categoryBtn);
         Button classificationBtn = findViewById(R.id.classificationBtn);
         Button stateBtn = findViewById(R.id.stateBtn);
@@ -86,6 +89,7 @@ public class AddNoteActivity extends AppCompatActivity {
         String calledFrom=null;
         if(extras!=null) calledFrom = extras.getString(CustomConstants.CALLED_BY);
         if(calledFrom!=null && calledFrom.equals(CustomConstants.NOTES_RV_ADAPTER)){
+            toolbar.setTitle("Edit Note");
             editContent.setText(extras.getString(CustomConstants.NOTE_CONTENT));
             categoryBtn.setText(extras.getString(CustomConstants.NOTE_CATEGORY));
             classificationBtn.setText(extras.getString(CustomConstants.NOTE_CLASSIFICATION));
@@ -110,6 +114,7 @@ public class AddNoteActivity extends AppCompatActivity {
             });
         }
         else {
+            toolbar.setTitle("Add Note");
             addNoteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -156,7 +161,7 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void signInAndBackupDBtoDrive(ActivityResultLauncher<Intent> signInLauncher) {
-        GoogleSignInClient client = GoogleDriveUtils.signInGoogleAndGetClient(AddNoteActivity.this);
+        GoogleSignInClient client = GoogleDriveUtils.signInGoogleAndGetClient(AddEditNoteActivity.this);
         Intent signInIntent = client.getSignInIntent();
         signInLauncher.launch(signInIntent);
     }

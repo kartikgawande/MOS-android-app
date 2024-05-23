@@ -1,6 +1,9 @@
 package com.example.mos.notesNotifications.receivers;
 
 import static com.example.mos.CustomConstants.EYE_CARE_NOTIFICATION_CHANNEL_ID;
+import static com.example.mos.CustomConstants.MAIN_ACTIVITY;
+import static com.example.mos.CustomConstants.NOTES_ACTIVITY;
+import static com.example.mos.CustomConstants.SOURCE;
 
 import android.Manifest;
 import android.app.AlarmManager;
@@ -20,6 +23,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.example.mos.R;
+import com.example.mos.appStateTracker.AppStateTracker;
 
 public class EyeCareReceiver extends BroadcastReceiver {
     @Override
@@ -35,12 +39,14 @@ public class EyeCareReceiver extends BroadcastReceiver {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             Intent alarmScheduleIntent = new Intent(context, EyeCareReceiver.class);
-            if(PendingIntent.getBroadcast(context, 0, alarmScheduleIntent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) != null){
-//                Toast.makeText(context, "Already scheduled.", Toast.LENGTH_SHORT).show();
-                return;
+            if(PendingIntent.getBroadcast(context, 0, alarmScheduleIntent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) == null){
+                //not scheduled
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                scheduleNextAlarm(context, pendingIntent);
             }
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-            scheduleNextAlarm(context, pendingIntent);
+
+            String calledBy = intent.getStringExtra(SOURCE);
+            if(calledBy!=null && calledBy.equals(MAIN_ACTIVITY)) return;
 
 //            notificationManager.cancelAll();
             notificationManager.notify(0, notificationBuilder.build());

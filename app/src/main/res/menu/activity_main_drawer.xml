@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+<!--            android:id="@+id/nav_home"-->
+        <item
+            android:id="@+id/nav_notes"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Notes" />
+<!--            android:id="@+id/nav_gallery"-->
+        <item
+            android:id="@+id/nav_daily_logs"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Daily Logs" />
+<!--            android:id="@+id/nav_slideshow"-->
+        <item
+            android:id="@+id/nav_routines"
+            android:icon="@android:drawable/ic_menu_rotate"
+            android:title="Routines" />
+    </group>
+</menu>

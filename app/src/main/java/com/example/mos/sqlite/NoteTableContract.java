@@ -14,4 +14,12 @@ public class NoteTableContract {
         public static final String COLUMN_NAME_CONTENT  = "Content";
         public static final String COLUMN_NAME_STATE  = "State";
     }
+
+    public static class DailyLogsTable implements BaseColumns{
+        public static final String TABLE_NAME = "DailyLogTable";
+        public static final String COLUMN_DAY = "Day";
+        public static final String COLUMN_DATE = "Date";
+        public static final String COLUMN_MONTH = "Month";
+        public static final String COLUMN_YEAR = "Year";
+    }
 }

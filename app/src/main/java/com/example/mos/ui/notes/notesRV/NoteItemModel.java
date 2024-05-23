@@ -1,4 +1,4 @@
-package com.example.mos.notesRV;
+package com.example.mos.ui.notes.notesRV;
 
 public class NoteItemModel {
     String classification, category, state, content;

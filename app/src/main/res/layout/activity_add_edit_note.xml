@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/addEditNotelayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.notes.AddEditNoteActivity">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/addNoteToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/Theme.MOS.PopupOverlay"
+        app:title="Add/Edit Note"
+        app:titleTextColor="@color/white"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addNoteToolbar">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addNoteBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:clickable="true"
+            android:contentDescription="@string/todo"
+            app:layout_constraintBottom_toTopOf="@+id/noteInfo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@android:drawable/checkbox_on_background" />
+
+        <EditText
+            android:id="@+id/editContent"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/input_text_views_margin"
+            android:layout_marginRight="10dp"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            app:layout_constraintEnd_toStartOf="@+id/addNoteBtn"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/noteInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/editContent">
+
+            <Button
+                android:id="@+id/categoryBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/text_views_margin"
+                android:layout_marginRight="@dimen/text_views_margin"
+                android:layout_weight="1"
+                android:text="Mindset" />
+
+            <Button
+                android:id="@+id/classificationBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/text_views_margin"
+                android:layout_marginRight="@dimen/text_views_margin"
+                android:layout_weight="1"
+                android:text="Physical" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/stateBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/text_views_margin"
+            android:layout_marginRight="@dimen/text_views_margin"
+            android:layout_weight="1"
+            android:text="Experimental"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/noteInfo" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

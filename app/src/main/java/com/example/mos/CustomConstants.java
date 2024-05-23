@@ -33,5 +33,8 @@ public class CustomConstants {
     public final static String TYPE_CLASS = "Classification";
     public final static String TYPE_CATEGORY = "Category";
     public final static String TYPE_STATE = "State";
+    public final static String NOTES_ACTIVITY = "NotesActivity";
+    public final static String MAIN_ACTIVITY = "MainActivity";
+    public final static String SOURCE = "Source";
 
 }

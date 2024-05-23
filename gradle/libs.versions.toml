@@ -11,6 +11,10 @@ googlegms = "21.0.0"
 googledriveapi = "1.30.10"
 googlegson = "1.34.2"
 googledriveservices = "v3-rev20240123-2.0.0"
+lifecycleLivedataKtx = "2.6.1"
+lifecycleViewmodelKtx = "2.6.1"
+navigationFragment = "2.6.0"
+navigationUi = "2.6.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -24,6 +28,10 @@ googlesignin = { group = "com.google.android.gms", name = "play-services-auth", 
 googledriveapi = { group = "com.google.api-client", name = "google-api-client-android", version.ref = "googledriveapi" }
 googlegson = { group = "com.google.http-client", name = "google-http-client-gson", version.ref = "googlegson" }
 googledriveservices = { group = "com.google.apis", name = "google-api-services-drive", version.ref = "googledriveservices" }
+lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
+lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
+navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

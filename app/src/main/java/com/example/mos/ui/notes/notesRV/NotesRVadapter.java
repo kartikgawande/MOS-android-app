@@ -1,9 +1,8 @@
-package com.example.mos.notesRV;
+package com.example.mos.ui.notes.notesRV;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.provider.SyncStateContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,17 +13,15 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mos.AddNoteActivity;
+import com.example.mos.ui.notes.AddEditNoteActivity;
 import com.example.mos.CustomConstants;
-import com.example.mos.MainActivity;
 import com.example.mos.R;
 import com.example.mos.googleDrive.GoogleDriveUtils;
 import com.example.mos.sqlite.DBUtils;
-import com.example.mos.sqlite.SQLiteDbHelper;
-import com.google.api.services.drive.Drive;
+import com.example.mos.sqlite.SQLiteDbQueries;
+import com.example.mos.ui.notes.NotesFragment;
 
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 public class NotesRVadapter extends RecyclerView.Adapter {
     Context context;
@@ -54,8 +51,8 @@ public class NotesRVadapter extends RecyclerView.Adapter {
         noteHolder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.notesRVupdating=false;
-                Intent editNoteIntent = new Intent(context, AddNoteActivity.class);
+                NotesFragment.notesRVupdating=false;
+                Intent editNoteIntent = new Intent(context, AddEditNoteActivity.class);
                 editNoteIntent.putExtra(CustomConstants.CALLED_BY,CustomConstants.NOTES_RV_ADAPTER);
                 editNoteIntent.putExtra(CustomConstants.NOTE_CATEGORY,note.getCategory());
                 editNoteIntent.putExtra(CustomConstants.NOTE_CLASSIFICATION,note.getClassification());
@@ -72,12 +69,12 @@ public class NotesRVadapter extends RecyclerView.Adapter {
             public boolean onLongClick(View v) {
                 noteHolder.layout.setOnClickListener(null);
                 String dbRowId = note.getDbRowNo();
-                SQLiteDbHelper dbHelper = new SQLiteDbHelper(context);
+                SQLiteDbQueries dbHelper = new SQLiteDbQueries(context);
                 SQLiteDatabase dbw = dbHelper.getWritableDatabase();
 
                 Toast.makeText(context, "Deleting", Toast.LENGTH_SHORT).show();
-                DBUtils.deleteRow(dbRowId,dbw);
-                DBUtils.backupDBtoDriveRedownloadAndRefreshLocalDB(context, SQLiteDbHelper.DATABASE_NAME,GoogleDriveUtils.getDriveServiceFromLastSignedIn(context));
+                SQLiteDbQueries.deleteRow(dbRowId,dbw);
+                DBUtils.backupDBtoDriveRedownloadAndRefreshLocalDB(context, SQLiteDbQueries.DATABASE_NAME,GoogleDriveUtils.getDriveServiceFromLastSignedIn(context));
                 return false;
             }
         });

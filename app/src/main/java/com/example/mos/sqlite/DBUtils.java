@@ -4,21 +4,19 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.mos.CustomConstants;
-import com.example.mos.MainActivity;
 import com.example.mos.googleDrive.GoogleDriveUtils;
-import com.example.mos.notesRV.NoteItemModel;
+import com.example.mos.ui.notes.notesRV.NoteItemModel;
+import com.example.mos.ui.notes.NotesFragment;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -94,7 +92,7 @@ public class DBUtils {
                         Log.d(CUSTOM_LOG_TAG, "done overwriting");
                     }
                     GoogleDriveUtils.downloadFileSaveAndUpdateDBlocalFile(filename,googleDriveService,filename,APP_DIRECTORY,context,filename,filename);
-                    MainActivity.notesRVupdating=false;
+                    NotesFragment.notesRVupdating=false;
                 } catch (Exception e) {
                     Log.e(CUSTOM_LOG_TAG, "run: in CreateFIleIndrive", e);
                 }
@@ -156,21 +154,6 @@ public class DBUtils {
         thread.start();
     }
 
-    public static ArrayList<NoteItemModel> convertResultToNotes(ArrayList<Map<String,String>> result){
-        ArrayList<NoteItemModel> notes = new ArrayList<>();
-        for(Map<String, String> row: result){
-            NoteItemModel note = new NoteItemModel();
-            note.setState(row.get(NoteTableContract.NoteTable.COLUMN_NAME_STATE));
-            note.setCategory(row.get(NoteTableContract.NoteTable.COLUMN_NAME_CATEGORY));
-            note.setContent(row.get(NoteTableContract.NoteTable.COLUMN_NAME_CONTENT));
-            note.setClassification(row.get(NoteTableContract.NoteTable.COLUMN_NAME_CLASSIFICATION));
-            note.setDbRowNo(row.get(BaseColumns._ID));
-
-            notes.add(note);
-        }
-        return notes;
-    }
-
     public static void updateLocalDBwithLocalBackupFile(Context context, String backupFileName, String databaseName){
         File currentDB = context.getDatabasePath(databaseName);
         File backupFile = new File(context.getFilesDir(), backupFileName);
@@ -187,10 +170,5 @@ public class DBUtils {
         } catch (IOException e) {
             Log.e(CUSTOM_LOG_TAG, "updateLocalDBwithLocalBackupFile: ", e);
         }
-
-    }
-
-    public static void deleteRow(String notificationID, SQLiteDatabase dbw) {
-        dbw.delete(NoteTableContract.NoteTable.TABLE_NAME, "_ID = ?", new String[]{notificationID});
     }
 }
