@@ -1,5 +1,9 @@
 package com.example.mos.notesNotifications.receivers;
 
+import static com.example.mos.CustomConstants.DISCARDED_STATE;
+import static com.example.mos.CustomConstants.EXPERIMENTAL_STATE;
+import static com.example.mos.CustomConstants.TESTED_STATE;
+
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -46,7 +50,7 @@ public class NotesReminderReceiver extends BroadcastReceiver {
         if(notes.isEmpty())return;
         boolean haveNonDiscarded = false;
         for(NoteItemModel note: notes){
-            if(note.getState().equals(AddNoteActivity.TESTED_STATE) || note.getState().equals(AddNoteActivity.EXPERIMENTAL_STATE)) haveNonDiscarded = true;
+            if(note.getState().equals(TESTED_STATE) || note.getState().equals(EXPERIMENTAL_STATE)) haveNonDiscarded = true;
         }
         if(!haveNonDiscarded) return;
         Random rand = new Random();
@@ -54,7 +58,7 @@ public class NotesReminderReceiver extends BroadcastReceiver {
         while(true) {
             randIndex = rand.nextInt(notes.size());
             String state = result.get(randIndex).get(NoteTableContract.NoteTable.COLUMN_NAME_STATE);
-            if(!state.equals(AddNoteActivity.DISCARDED_STATE)) break;
+            if(!state.equals(DISCARDED_STATE)) break;
         }
         String id = result.get(randIndex).get(BaseColumns._ID);
 
@@ -103,18 +107,24 @@ public class NotesReminderReceiver extends BroadcastReceiver {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            Intent alarmScheduleIntent = new Intent(context, EyeCareReceiver.class);
+            if(PendingIntent.getBroadcast(context, 0, alarmScheduleIntent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) != null){
+//                Toast.makeText(context, "Already scheduled.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            PendingIntent alarmSchedulePendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            scheduleNextAlarm(context, alarmSchedulePendingIntent);
+
 //            notificationManager.cancelAll();
             notificationManager.notify(Integer.parseInt(id), notificationBuilder.build());
-            scheduleNextAlarm(context);
         }
     }
 
-    private void scheduleNextAlarm(Context context) {
-        Intent intent = new Intent(context, NotesReminderReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
+    private void scheduleNextAlarm(Context context, PendingIntent pendingIntent) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.canScheduleExactAlarms();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            alarmManager.canScheduleExactAlarms();
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.HOUR, 1); // Schedule for one hour later again

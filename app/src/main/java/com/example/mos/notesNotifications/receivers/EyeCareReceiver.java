@@ -13,6 +13,7 @@ import android.icu.util.Calendar;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -33,6 +34,14 @@ public class EyeCareReceiver extends BroadcastReceiver {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            Intent alarmScheduleIntent = new Intent(context, EyeCareReceiver.class);
+            if(PendingIntent.getBroadcast(context, 0, alarmScheduleIntent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) != null){
+//                Toast.makeText(context, "Already scheduled.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            scheduleNextAlarm(context, pendingIntent);
+
 //            notificationManager.cancelAll();
             notificationManager.notify(0, notificationBuilder.build());
             // Schedule sound to play after 20 seconds
@@ -42,7 +51,6 @@ public class EyeCareReceiver extends BroadcastReceiver {
                     playSound(context);
                 }
             }, 20000); // Delay matches the notification timeout
-            scheduleNextAlarm(context);
         }
     }
 
@@ -59,12 +67,14 @@ public class EyeCareReceiver extends BroadcastReceiver {
         }
     }
 
-    private void scheduleNextAlarm(Context context) {
-        Intent intent = new Intent(context, EyeCareReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
+    private void scheduleNextAlarm(Context context, PendingIntent pendingIntent) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.canScheduleExactAlarms();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if(!alarmManager.canScheduleExactAlarms()){
+                Toast.makeText(context, "Cant schedule alarms.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.MINUTE, 20); // Schedule for 20 minute later again

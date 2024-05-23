@@ -1,5 +1,16 @@
 package com.example.mos;
 
+import static com.example.mos.CustomConstants.DISCARDED_STATE;
+import static com.example.mos.CustomConstants.EMOTION_CLASSIFICATION;
+import static com.example.mos.CustomConstants.EXPERIMENTAL_STATE;
+import static com.example.mos.CustomConstants.FINANCIAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.MENTAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.MINDSET_CATEGORY;
+import static com.example.mos.CustomConstants.PHYSICAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.RULES_CATEGORY;
+import static com.example.mos.CustomConstants.SOCIAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.TESTED_STATE;
+
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -29,16 +40,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.api.services.drive.Drive;
 
 public class AddNoteActivity extends AppCompatActivity {
-    private final String MINDSET_CATEGORY = "Mindset";
-    private final String RULES_CATEGORY = "Rules";
-    private final String PHYSICAL_CLASSIFICATION = "Physical";
-    private final String SOCIAL_CLASSIFICATION = "Social";
-    private final String MENTAL_CLASSIFICATION = "Mental";
-    private final String EMOTION_CLASSIFICATION = "Emotional";
-    private final String FINANCIAL_CLASSIFICATION = "Financial";
-    public static final String EXPERIMENTAL_STATE = "Experimental";
-    public static final String TESTED_STATE = "Tested";
-    public static final String DISCARDED_STATE = "Discarded";
 
     SQLiteDbHelper dbHelper;
 

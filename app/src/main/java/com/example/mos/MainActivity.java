@@ -1,5 +1,22 @@
 package com.example.mos;
 
+import static com.example.mos.CustomConstants.ALL_CATEGORIES;
+import static com.example.mos.CustomConstants.ALL_CLASSES;
+import static com.example.mos.CustomConstants.ALL_STATES;
+import static com.example.mos.CustomConstants.DISCARDED_STATE;
+import static com.example.mos.CustomConstants.EMOTION_CLASSIFICATION;
+import static com.example.mos.CustomConstants.EXPERIMENTAL_STATE;
+import static com.example.mos.CustomConstants.FINANCIAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.MENTAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.MINDSET_CATEGORY;
+import static com.example.mos.CustomConstants.PHYSICAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.RULES_CATEGORY;
+import static com.example.mos.CustomConstants.SOCIAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.TESTED_STATE;
+import static com.example.mos.CustomConstants.TYPE_CATEGORY;
+import static com.example.mos.CustomConstants.TYPE_CLASS;
+import static com.example.mos.CustomConstants.TYPE_STATE;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
@@ -31,6 +48,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.mos.googleDrive.GoogleDriveUtils;
@@ -46,6 +64,7 @@ import com.google.api.services.drive.Drive;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.OnDriveUpdatedLocalDBlistener {
@@ -59,8 +78,6 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
     Intent signInIntent;
     ActivityResultLauncher<Intent> signInLauncher;
     public static Boolean notesRVupdating=false;
-
-    private static int NOTIFICATION_REPEAT_AFTER_MILIS=1000*60*60;
 
     ArrayList<NoteItemModel> notes = new ArrayList<>();
 
@@ -158,6 +175,61 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
                 startActivity(addNoteActIntent);
             }
         });
+
+        Button classFilterBtn = findViewById(R.id.classFilterBtn);
+        Button categoryFilterBtn = findViewById(R.id.categoryFilterBtn);
+        Button stateFilterBtn = findViewById(R.id.stateFilterBtn);
+
+        classFilterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String label = classFilterBtn.getText().toString();
+                if(label.equals(ALL_CLASSES)) classFilterBtn.setText(PHYSICAL_CLASSIFICATION);
+                else if(label.equals(PHYSICAL_CLASSIFICATION)) classFilterBtn.setText(SOCIAL_CLASSIFICATION);
+                else if(label.equals(SOCIAL_CLASSIFICATION)) classFilterBtn.setText(MENTAL_CLASSIFICATION);
+                else if(label.equals(MENTAL_CLASSIFICATION)) classFilterBtn.setText(EMOTION_CLASSIFICATION);
+                else if(label.equals(EMOTION_CLASSIFICATION)) classFilterBtn.setText(FINANCIAL_CLASSIFICATION);
+                else if(label.equals(FINANCIAL_CLASSIFICATION)) classFilterBtn.setText(ALL_CLASSES);
+
+                filterRVnotes(classFilterBtn, categoryFilterBtn, stateFilterBtn);
+            }
+        });
+
+        categoryFilterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String label = categoryFilterBtn.getText().toString();
+                if(label.equals(ALL_CATEGORIES)) categoryFilterBtn.setText(MINDSET_CATEGORY);
+                else if(label.equals(MINDSET_CATEGORY)) categoryFilterBtn.setText(RULES_CATEGORY);
+                else if(label.equals(RULES_CATEGORY)) categoryFilterBtn.setText(ALL_CATEGORIES);
+
+                filterRVnotes(classFilterBtn, categoryFilterBtn, stateFilterBtn);
+            }
+        });
+
+        stateFilterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String label = stateFilterBtn.getText().toString();
+                if(label.equals(ALL_STATES)) stateFilterBtn.setText(EXPERIMENTAL_STATE);
+                else if(label.equals(EXPERIMENTAL_STATE)) stateFilterBtn.setText(TESTED_STATE);
+                else if(label.equals(TESTED_STATE)) stateFilterBtn.setText(DISCARDED_STATE);
+                else if(label.equals(DISCARDED_STATE)) stateFilterBtn.setText(ALL_STATES);
+
+                filterRVnotes(classFilterBtn, categoryFilterBtn, stateFilterBtn);
+            }
+        });
+    }
+
+    private void filterRVnotes(Button classFilterBtn, Button categoryFilterBtn, Button stateFilterBtn){
+        String classFilter = classFilterBtn.getText().toString();
+        String categoryFilter = categoryFilterBtn.getText().toString();
+        String stateFilter = stateFilterBtn.getText().toString();
+
+        notes.clear();
+        notes.addAll(filterNotes(classFilter,categoryFilter,stateFilter));
+        Collections.reverse(notes);
+        notesRVadapter.notifyDataSetChanged();
     }
 
     private ArrayList<NoteItemModel> refreshNotesArraylistFromLocalDB() {
@@ -166,6 +238,33 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
         SQLiteDatabase dbr = dbHelper.getReadableDatabase();
         ArrayList<Map<String,String>> result = dbHelper.getAllRows(dbr, null, null);
         ArrayList<NoteItemModel> notes = new ArrayList<>(DBUtils.convertResultToNotes(result));
+        return notes;
+    }
+
+    private ArrayList<NoteItemModel> filterNotes(String CLASS ,String CATEGORY, String STATE){
+        ArrayList<NoteItemModel> notes = new ArrayList<>();
+        notes.addAll(refreshNotesArraylistFromLocalDB());
+        Iterator<NoteItemModel> noteIterator = notes.iterator();
+        if(!CLASS.equals(ALL_CLASSES)) {
+            while(noteIterator.hasNext()){
+                NoteItemModel note = noteIterator.next();
+                if (!note.getClassification().equals(CLASS)) noteIterator.remove();
+            }
+        }
+        noteIterator = notes.iterator();
+        if(!CATEGORY.equals(ALL_CATEGORIES)) {
+            while(noteIterator.hasNext()){
+                NoteItemModel note = noteIterator.next();
+                if (!note.getCategory().equals(CATEGORY)) noteIterator.remove();
+            }
+        }
+        noteIterator = notes.iterator();
+        if(!STATE.equals(ALL_STATES)){
+            while(noteIterator.hasNext()){
+                NoteItemModel note = noteIterator.next();
+                if (!note.getState().equals(STATE)) noteIterator.remove();
+            }
+        }
         return notes;
     }
 
@@ -186,11 +285,6 @@ public class MainActivity extends AppCompatActivity implements GoogleDriveUtils.
     @Override
     protected void onResume() {
         super.onResume();
-        if(!notesRVupdating)signInLauncher.launch(signInIntent);
-    }
-
-    public void customOnResume(){
-        while (notesRVupdating);
         if(!notesRVupdating)signInLauncher.launch(signInIntent);
     }
 

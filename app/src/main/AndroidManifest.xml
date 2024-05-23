@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
 
     <application
@@ -27,16 +28,13 @@
 <!--                the com.mos part above is random i choose it arbitrarily to keep it unique-->
             </intent-filter>
         </receiver>
+        <receiver android:name=".notesNotifications.receivers.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
         <receiver android:name=".notesNotifications.receivers.EyeCareReceiver"
-            android:exported="true"/>
-        <receiver android:name=".notesNotifications.receivers.DiscardBtnReceiver"
-            android:exported="true"/>
-        <receiver android:name=".notesNotifications.receivers.TestedBtnReceiver"
-            android:exported="true"/>
-        <service android:name=".notesNotifications.services.DiscardBtnService"
-            android:exported="true"
-            android:foregroundServiceType="shortService"/>
-        <service android:name=".notesNotifications.services.TestedBtnService"
             android:exported="true"/>
         <activity
             android:name=".AddNoteActivity"
