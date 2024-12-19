@@ -7,9 +7,13 @@ import static com.example.mos.CustomConstants.DISCARDED_STATE;
 import static com.example.mos.CustomConstants.EMOTION_CLASSIFICATION;
 import static com.example.mos.CustomConstants.EXPERIMENTAL_STATE;
 import static com.example.mos.CustomConstants.FINANCIAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.FOR;
+import static com.example.mos.CustomConstants.FOR_KARTIK;
+import static com.example.mos.CustomConstants.FOR_KETAN;
 import static com.example.mos.CustomConstants.MENTAL_CLASSIFICATION;
 import static com.example.mos.CustomConstants.MINDSET_CATEGORY;
 import static com.example.mos.CustomConstants.PHYSICAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.ROMANTIC_CLASSIFICATION;
 import static com.example.mos.CustomConstants.RULES_CATEGORY;
 import static com.example.mos.CustomConstants.SOCIAL_CLASSIFICATION;
 import static com.example.mos.CustomConstants.TESTED_STATE;
@@ -61,6 +65,7 @@ public class NotesFragment extends Fragment{
 
 
         noteRV = binding.notesRV;
+//        noteRV.setVisibility(View.GONE);
         notesRVadapter = new NotesRVadapter(requireContext(), notes);
         noteRV.setLayoutManager(new LinearLayoutManager(requireContext()));
         noteRV.setAdapter(notesRVadapter);
@@ -95,10 +100,16 @@ public class NotesFragment extends Fragment{
                 String label = classFilterBtn.getText().toString();
                 if(label.equals(ALL_CLASSES)) classFilterBtn.setText(PHYSICAL_CLASSIFICATION);
                 else if(label.equals(PHYSICAL_CLASSIFICATION)) classFilterBtn.setText(SOCIAL_CLASSIFICATION);
-                else if(label.equals(SOCIAL_CLASSIFICATION)) classFilterBtn.setText(MENTAL_CLASSIFICATION);
                 else if(label.equals(MENTAL_CLASSIFICATION)) classFilterBtn.setText(EMOTION_CLASSIFICATION);
                 else if(label.equals(EMOTION_CLASSIFICATION)) classFilterBtn.setText(FINANCIAL_CLASSIFICATION);
                 else if(label.equals(FINANCIAL_CLASSIFICATION)) classFilterBtn.setText(ALL_CLASSES);
+                else if(FOR.equals(FOR_KETAN)){
+                    if(label.equals(SOCIAL_CLASSIFICATION)) classFilterBtn.setText(ROMANTIC_CLASSIFICATION);
+                    else if(label.equals(ROMANTIC_CLASSIFICATION)) classFilterBtn.setText(MENTAL_CLASSIFICATION);
+                }
+                else if(FOR.equals(FOR_KARTIK)){
+                    if(label.equals(SOCIAL_CLASSIFICATION)) classFilterBtn.setText(MENTAL_CLASSIFICATION);
+                }
 
                 filterRVnotes(classFilterBtn, categoryFilterBtn, stateFilterBtn);
             }

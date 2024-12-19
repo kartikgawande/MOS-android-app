@@ -17,7 +17,7 @@
 <!--            android:id="@+id/nav_slideshow"-->
         <item
             android:id="@+id/nav_routines"
-            android:icon="@android:drawable/ic_menu_rotate"
+            android:icon="@drawable/ic_menu_slideshow"
             android:title="Routines" />
     </group>
 </menu>

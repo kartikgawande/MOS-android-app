@@ -1,6 +1,11 @@
 package com.example.mos;
 
+import androidx.core.view.ViewCompat;
+
 public class CustomConstants {
+    public final static String FOR_KETAN = "Ketan";
+    public final static String FOR_KARTIK = "Kartik";
+    public final static String FOR = FOR_KARTIK;
     public final static String CUSTOM_LOG_TAG = "customLogTag";
     public final static String CONTEXT = "context";
     public final static String DRIVE_APP_DIR = "MOSapp";
@@ -30,6 +35,7 @@ public class CustomConstants {
     public final static String MENTAL_CLASSIFICATION = "Mental";
     public final static String EMOTION_CLASSIFICATION = "Emotional";
     public final static String FINANCIAL_CLASSIFICATION = "Financial";
+    public final static String ROMANTIC_CLASSIFICATION = "Romantic";
     public final static String TYPE_CLASS = "Classification";
     public final static String TYPE_CATEGORY = "Category";
     public final static String TYPE_STATE = "State";

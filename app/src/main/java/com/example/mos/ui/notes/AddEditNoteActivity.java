@@ -4,9 +4,13 @@ import static com.example.mos.CustomConstants.DISCARDED_STATE;
 import static com.example.mos.CustomConstants.EMOTION_CLASSIFICATION;
 import static com.example.mos.CustomConstants.EXPERIMENTAL_STATE;
 import static com.example.mos.CustomConstants.FINANCIAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.FOR;
+import static com.example.mos.CustomConstants.FOR_KARTIK;
+import static com.example.mos.CustomConstants.FOR_KETAN;
 import static com.example.mos.CustomConstants.MENTAL_CLASSIFICATION;
 import static com.example.mos.CustomConstants.MINDSET_CATEGORY;
 import static com.example.mos.CustomConstants.PHYSICAL_CLASSIFICATION;
+import static com.example.mos.CustomConstants.ROMANTIC_CLASSIFICATION;
 import static com.example.mos.CustomConstants.RULES_CATEGORY;
 import static com.example.mos.CustomConstants.SOCIAL_CLASSIFICATION;
 import static com.example.mos.CustomConstants.TESTED_STATE;
@@ -142,10 +146,16 @@ public class AddEditNoteActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String label = classificationBtn.getText().toString();
                 if(label.equals(PHYSICAL_CLASSIFICATION)) classificationBtn.setText(SOCIAL_CLASSIFICATION);
-                else if(label.equals(SOCIAL_CLASSIFICATION)) classificationBtn.setText(MENTAL_CLASSIFICATION);
                 else if(label.equals(MENTAL_CLASSIFICATION)) classificationBtn.setText(EMOTION_CLASSIFICATION);
                 else if(label.equals(EMOTION_CLASSIFICATION)) classificationBtn.setText(FINANCIAL_CLASSIFICATION);
                 else if(label.equals(FINANCIAL_CLASSIFICATION)) classificationBtn.setText(PHYSICAL_CLASSIFICATION);
+                else if(FOR.equals(FOR_KETAN)){
+                    if(label.equals(SOCIAL_CLASSIFICATION)) classificationBtn.setText(ROMANTIC_CLASSIFICATION);
+                    else if(label.equals(ROMANTIC_CLASSIFICATION)) classificationBtn.setText(MENTAL_CLASSIFICATION);
+                }
+                else if(FOR.equals(FOR_KARTIK)){
+                    if(label.equals(SOCIAL_CLASSIFICATION)) classificationBtn.setText(MENTAL_CLASSIFICATION);
+                }
             }
         });
 
